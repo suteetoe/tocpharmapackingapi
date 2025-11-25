@@ -222,29 +222,105 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "receipt_number": {
+                    "doc_no": {
                       "type": "string"
                     },
-                    "customer_name": {
-                      "type": "string"
+                    "trans_flag": {
+                      "type": "integer"
                     },
-                    "items": {
+                    "doc_date": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
+                    "cust_code": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "total_amount": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "arCustomer": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "name_1": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      }
+                    },
+                    "details": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "product_id": {
+                          "roworder": {
                             "type": "integer"
                           },
-                          "product_name": {
+                          "doc_no": {
                             "type": "string"
                           },
-                          "quantity": {
+                          "trans_flag": {
                             "type": "integer"
+                          },
+                          "item_code": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "item_name": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "qty": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "unit_code": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "price": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "discount": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "sum_amount": {
+                            "type": "string",
+                            "nullable": true
                           },
                           "is_serial_number": {
                             "type": "integer",
+                            "nullable": true,
                             "description": "Indicates if the product requires serial number tracking (0 or 1)"
+                          },
+                          "icInventory": {
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "name_1": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "ic_serial_no": {
+                                "type": "integer",
+                                "nullable": true
+                              },
+                              "is_pharma_serialization": {
+                                "type": "integer",
+                                "nullable": true
+                              }
+                            }
                           }
                         }
                       }
@@ -279,20 +355,44 @@
                 "type": "object",
                 "required": [
                   "invoice_no",
-                  "employee_code",
                   "serials"
                 ],
                 "properties": {
                   "invoice_no": {
                     "type": "string"
                   },
-                  "employee_code": {
-                    "type": "string"
-                  },
                   "serials": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "doc_no",
+                        "trans_flag",
+                        "doc_line_number",
+                        "ic_code",
+                        "serial_number",
+                        "cust_code"
+                      ],
+                      "properties": {
+                        "doc_no": {
+                          "type": "string"
+                        },
+                        "trans_flag": {
+                          "type": "integer"
+                        },
+                        "doc_line_number": {
+                          "type": "integer"
+                        },
+                        "ic_code": {
+                          "type": "string"
+                        },
+                        "serial_number": {
+                          "type": "string"
+                        },
+                        "cust_code": {
+                          "type": "string"
+                        }
+                      }
                     }
                   }
                 }
@@ -311,8 +411,8 @@
                     "success": {
                       "type": "boolean"
                     },
-                    "packing_id": {
-                      "type": "integer"
+                    "message": {
+                      "type": "string"
                     }
                   }
                 }
@@ -321,6 +421,9 @@
           },
           "400": {
             "description": "Validation failed"
+          },
+          "404": {
+            "description": "Invoice not found"
           }
         }
       }
@@ -354,13 +457,112 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "invoice_no": {
+                    "doc_no": {
                       "type": "string"
                     },
-                    "packed_items": {
+                    "trans_flag": {
+                      "type": "integer"
+                    },
+                    "doc_date": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
+                    "cust_code": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "total_amount": {
+                      "type": "string"
+                    },
+                    "arCustomer": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "name_1": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "telephone": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "details": {
                       "type": "array",
                       "items": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                          "roworder": {
+                            "type": "integer"
+                          },
+                          "item_code": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "item_name": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "qty": {
+                            "type": "string"
+                          },
+                          "unit_code": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "price": {
+                            "type": "string"
+                          },
+                          "icInventory": {
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "name_1": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "ic_serial_no": {
+                                "type": "integer",
+                                "nullable": true
+                              },
+                              "is_pharma_serialization": {
+                                "type": "integer",
+                                "nullable": true
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "serialnumbers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ic_code": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "serial_number": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "line_number": {
+                            "type": "integer"
+                          },
+                          "doc_line_number": {
+                            "type": "integer",
+                            "nullable": true
+                          }
+                        }
                       }
                     }
                   }
