@@ -1,0 +1,507 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TOC Pharma Packing API",
+    "version": "1.0.0",
+    "description": "API documentation for TOC Pharma Packing application",
+    "contact": {
+      "name": "API Support"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "description": "Check if the API is running",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "API is running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login user",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/employee/validate-employee": {
+      "post": {
+        "summary": "Validate employee by code",
+        "tags": [
+          "Employee"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "employee_id"
+                ],
+                "properties": {
+                  "employee_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Employee valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "employee": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found"
+          }
+        }
+      }
+    },
+    "/invoice/get-invoice-details": {
+      "post": {
+        "summary": "Get invoice details",
+        "tags": [
+          "Invoice"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "invoice_no"
+                ],
+                "properties": {
+                  "invoice_no": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invoice details retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "receipt_number": {
+                      "type": "string"
+                    },
+                    "customer_name": {
+                      "type": "string"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "product_id": {
+                            "type": "integer"
+                          },
+                          "product_name": {
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "type": "integer"
+                          },
+                          "is_serial_number": {
+                            "type": "integer",
+                            "description": "Indicates if the product requires serial number tracking (0 or 1)"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found"
+          }
+        }
+      }
+    },
+    "/invoice/shipment-confirm": {
+      "post": {
+        "summary": "Confirm shipment packing",
+        "tags": [
+          "Invoice"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "invoice_no",
+                  "employee_code",
+                  "serials"
+                ],
+                "properties": {
+                  "invoice_no": {
+                    "type": "string"
+                  },
+                  "employee_code": {
+                    "type": "string"
+                  },
+                  "serials": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipment confirmed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "packing_id": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          }
+        }
+      }
+    },
+    "/invoice/packing/{invoice_no}": {
+      "get": {
+        "summary": "Get packing print data",
+        "tags": [
+          "Invoice"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invoice_no",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Packing data for printing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "invoice_no": {
+                      "type": "string"
+                    },
+                    "packed_items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Packing not found"
+          }
+        }
+      }
+    },
+    "/product/get-product-by-serial": {
+      "post": {
+        "summary": "Get product by serial number",
+        "tags": [
+          "Product"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "serial_number"
+                ],
+                "properties": {
+                  "serial_number": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "icInventory": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "name_1": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "ic_serial_no": {
+                          "type": "number"
+                        },
+                        "is_pharma_serialization": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Serial number is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Serial not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Serial number not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints"
+    },
+    {
+      "name": "Employee",
+      "description": "Employee validation endpoints"
+    },
+    {
+      "name": "Invoice",
+      "description": "Invoice and packing endpoints"
+    },
+    {
+      "name": "Product",
+      "description": "Product and serial endpoints"
+    }
+  ]
+}

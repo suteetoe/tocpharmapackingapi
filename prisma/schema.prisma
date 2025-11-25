@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model MisUser {
+  roworder  Int      @id @default(autoincrement())
+  user_name String   @unique
+  password  String
+
+  @@map("mis_user")
+}
+
+model ErpUser {
+  roworder  Int      @id @default(autoincrement())
+  code      String   @unique
+  name_1    String
+
+  @@map("erp_user")
+}
+
+model IcTrans {
+  doc_no       String    @map("doc_no")
+  trans_flag   Int       @map("trans_flag")
+  doc_date     DateTime? @db.Date @map("doc_date")
+  cust_code    String?   @map("cust_code")
+  total_amount Decimal?  @db.Decimal @map("total_amount")
+
+  details      IcTransDetail[]
+  arCustomer   ArCustomer? @relation(fields: [cust_code], references: [code])
+
+  @@id([doc_no, trans_flag])
+  @@map("ic_trans")
+}
+
+model IcTransDetail {
+  roworder         Int      @id @map("roworder")
+  doc_no           String   @map("doc_no")
+  trans_flag       Int      @map("trans_flag")
+  item_code        String?  @map("item_code")
+  item_name        String?  @map("item_name")
+  qty              Decimal? @db.Decimal @map("qty")
+  unit_code        String?  @map("unit_code")
+  price            Decimal? @db.Decimal @map("price")
+  discount         String?  @map("discount")
+  sum_amount       Decimal? @db.Decimal @map("sum_amount")
+  is_serial_number Int?     @db.SmallInt @map("is_serial_number")
+
+  icTrans     IcTrans  @relation(fields: [doc_no, trans_flag], references: [doc_no, trans_flag])
+  icInventory IcInventory? @relation(fields: [item_code], references: [code])
+
+  @@map("ic_trans_detail")
+}
+
+model IcInventory {
+  code                    String          @id @map("code")
+  name_1                  String?         @map("name_1")
+  ic_serial_no            Int?            @db.SmallInt @map("ic_serial_no")
+  is_pharma_serialization Int?            @db.SmallInt @map("is_pharma_serialization")
+  icTransDetails          IcTransDetail[]
+  icSerials               IcSerial[]
+
+  @@map("ic_inventory")
+}
+
+model IcSerial {
+  ic_code       String   @map("ic_code") @db.VarChar(50)
+  serial_number String   @map("serial_number") @db.VarChar(255)
+  status        Int?     @map("status") @db.SmallInt
+  wh_code       String?  @map("wh_code") @db.VarChar(50)
+  shelf_code    String?  @map("shelf_code") @db.VarChar(50)
+
+  icInventory   IcInventory @relation(fields: [ic_code], references: [code])
+
+  @@id([ic_code, serial_number])
+  @@map("ic_serial")
+}
+
+model ArCustomer {
+  code   String  @id @map("code") @db.VarChar(50)
+  name_1 String? @map("name_1") @db.VarChar(255)
+  icTrans IcTrans[]
+
+  @@map("ar_customer")
+}
+
+model IcTransSerialNumber {
+  roworder        Int      @id @default(autoincrement()) @map("roworder")
+  doc_no          String?  @map("doc_no") @db.VarChar(50)
+  trans_flag      Int?     @map("trans_flag") @db.SmallInt
+  doc_line_number Int?     @map("doc_line_number") @db.SmallInt
+  ic_code         String?  @map("ic_code") @db.VarChar(25)
+  serial_number   String?  @map("serial_number") @db.VarChar(50)
+  unit_code       String?  @map("unit_code") @db.VarChar(10)
+  wh_code         String?  @map("wh_code") @db.VarChar(10)
+  shelf_code      String?  @map("shelf_code") @db.VarChar(10)
+  price           Decimal? @map("price") @db.Decimal
+  cust_code       String?  @map("cust_code") @db.VarChar(50)
+
+  @@map("ic_trans_serial_number")
+}
