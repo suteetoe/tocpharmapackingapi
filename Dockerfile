@@ -1,4 +1,7 @@
-FROM node:20-alpine AS builder
+FROM node:20.10-slim AS builder
+RUN apt-get update -y && apt-get install -y openssl
+RUN apt update && apt install tzdata -y
+ENV TZ="Asia/Bangkok"
 
 WORKDIR /app
 
@@ -15,8 +18,11 @@ RUN npm run build
 # Prune dev dependencies to reduce size
 RUN npm prune --production
 
-# Final stage
-FROM node:20-alpine
+# # Final stage
+FROM node:20.10-slim
+RUN apt-get update -y && apt-get install -y openssl
+RUN apt update && apt install tzdata -y
+ENV TZ="Asia/Bangkok"
 
 WORKDIR /app
 
