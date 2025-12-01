@@ -9,6 +9,7 @@ const port = config.port;
 
 app.use(helmet());
 app.use(cors({ origin: '*' }));
+app.options('*', cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
