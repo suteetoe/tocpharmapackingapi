@@ -71,6 +71,10 @@ const router = Router();
  *                         type: string
  *                       trans_flag:
  *                         type: integer
+ *                       line_number:
+ *                         type: integer
+ *                         nullable: true
+ *                         description: Line number of the item in the invoice
  *                       item_code:
  *                         type: string
  *                         nullable: true
@@ -232,6 +236,10 @@ router.post('/shipment-confirm', shipmentConfirm);
  *                     properties:
  *                       roworder:
  *                         type: integer
+ *                       line_number:
+ *                         type: integer
+ *                         nullable: true
+ *                         description: Line number of the item in the invoice
  *                       item_code:
  *                         type: string
  *                         nullable: true

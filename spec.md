@@ -213,6 +213,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   "details": [
     {
       "roworder": 1,
+      "line_number": 1,
       "item_code": "PROD001",
       "item_name": "ยาแก้ปวด 500mg",
       "qty": "100",
@@ -247,6 +248,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 **Field Descriptions:**
 - `trans_flag`: 44 = ใบเสร็จขาย (Invoice)
+- `line_number`: ลำดับที่ของสินค้าในบิล
 - `ic_serial_no`: 1 = สินค้าต้องมี Serial Number, 0 = ไม่ต้องมี
 - `is_pharma_serialization`: 1 = ต้องสแกน Serial แบบยาเสพติด, 0 = สแกนปกติ
 
@@ -489,6 +491,7 @@ GET /api/invoice/packing/INV2025001
   "details": [
     {
       "roworder": 1,
+      "line_number": 1,
       "item_code": "PROD001",
       "item_name": "ยาแก้ปวด 500mg",
       "qty": "100",

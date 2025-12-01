@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import config from './config/config';
 
-const app = express();
+export const app = express();
 const port = config.port;
 
 app.use(helmet());
@@ -31,6 +31,9 @@ app.all('*', (req, res, next) => {
 
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}
+

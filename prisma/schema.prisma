@@ -44,6 +44,7 @@ model IcTransDetail {
   roworder         Int      @id @map("roworder")
   doc_no           String   @map("doc_no")
   trans_flag       Int      @map("trans_flag")
+  line_number      Int?     @db.SmallInt @map("line_number")
   item_code        String?  @map("item_code")
   item_name        String?  @map("item_name")
   qty              Decimal? @db.Decimal @map("qty")
