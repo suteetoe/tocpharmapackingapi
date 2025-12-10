@@ -89,3 +89,37 @@ export const getSerialDetails = async (req: Request, res: Response, next: NextFu
     next(error);
   }
 };
+
+export const getSerialByIcCodeAndSerial = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { ic_code, serial_number } = req.body;
+    if (!ic_code || !serial_number) {
+      return res.status(400).json({ success: false, message: 'ic_code and serial_number are required' });
+    }
+    const serial = await prisma.icSerial.findFirst({
+      where: { ic_code, serial_number },
+      include: { icInventory: true },
+    });
+    if (!serial) {
+      return res.status(404).json({ success: false, message: 'Serial number not found' });
+    }
+    if (!serial.icInventory) {
+      return res.status(404).json({ success: false, message: 'Product not found for this serial' });
+    }
+    const response = {
+      success: true,
+      message: 'Product found',
+      data: {
+        ic_code: serial.ic_code,
+        serial_number: serial.serial_number,
+        status: serial.status,
+        wh_code: serial.wh_code,
+        shelf_code: serial.shelf_code,
+        icInventory: serial.icInventory,
+      },
+    };
+    return res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};

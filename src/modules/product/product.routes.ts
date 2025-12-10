@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProductBySerial, getSerialDetails } from './product.controller';
+import { getProductBySerial, getSerialDetails, getSerialByIcCodeAndSerial } from './product.controller';
 
 const router = Router();
 
@@ -144,5 +144,70 @@ router.post('/get-product-by-serial', getProductBySerial);
  *         description: Serial not found
  */
 router.post('/serial-number', getSerialDetails);
+
+/**
+ * @swagger
+ * /product/serial-by-ic-code:
+ *   post:
+ *     summary: Get serial details by ic_code and serial_number
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ic_code
+ *               - serial_number
+ *             properties:
+ *               ic_code:
+ *                 type: string
+ *               serial_number:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Serial details found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     ic_code:
+ *                       type: string
+ *                     serial_number:
+ *                       type: string
+ *                     status:
+ *                       type: number
+ *                     wh_code:
+ *                       type: string
+ *                     shelf_code:
+ *                       type: string
+ *                     icInventory:
+ *                       type: object
+ *                       properties:
+ *                         code:
+ *                           type: string
+ *                         name_1:
+ *                           type: string
+ *                         ic_serial_no:
+ *                           type: number
+ *                         is_pharma_serialization:
+ *                           type: number
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: Serial not found
+ */
+router.post('/serial-by-ic-code', getSerialByIcCodeAndSerial);
 
 export default router;
