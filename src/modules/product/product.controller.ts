@@ -1,14 +1,19 @@
-import { Request, Response, NextFunction } from 'express';
-import prisma from '../../config/prisma';
+import { Request, Response, NextFunction } from "express";
+import { InventoryBarcode, IcSerial } from "@prisma/client";
+import prisma from "../../config/prisma";
 
-export const getProductBySerial = async (req: Request, res: Response, next: NextFunction) => {
+export const getProductBySerial = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { serial_number } = req.body;
 
     if (!serial_number) {
       res.status(400).json({
         success: false,
-        message: 'Serial number is required',
+        message: "Serial number is required",
       });
       return;
     }
@@ -25,7 +30,7 @@ export const getProductBySerial = async (req: Request, res: Response, next: Next
     if (!serial) {
       res.status(404).json({
         success: false,
-        message: 'Serial number not found',
+        message: "Serial number not found",
       });
       return;
     }
@@ -33,14 +38,14 @@ export const getProductBySerial = async (req: Request, res: Response, next: Next
     if (!serial.icInventory) {
       res.status(404).json({
         success: false,
-        message: 'Product not found for this serial',
+        message: "Product not found for this serial",
       });
       return;
     }
 
     const response = {
       success: true,
-      message: 'Product found',
+      message: "Product found",
       icInventory: {
         code: serial.icInventory.code,
         name_1: serial.icInventory.name_1,
@@ -56,25 +61,35 @@ export const getProductBySerial = async (req: Request, res: Response, next: Next
   }
 };
 
-export const getSerialDetails = async (req: Request, res: Response, next: NextFunction) => {
+export const getSerialDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { serial_number } = req.body;
     if (!serial_number) {
-      return res.status(400).json({ success: false, message: 'Serial number is required' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Serial number is required" });
     }
     const serial = await prisma.icSerial.findFirst({
       where: { serial_number },
       include: { icInventory: true },
     });
     if (!serial) {
-      return res.status(404).json({ success: false, message: 'Serial number not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Serial number not found" });
     }
     if (!serial.icInventory) {
-      return res.status(404).json({ success: false, message: 'Product not found for this serial' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found for this serial" });
     }
     const response = {
       success: true,
-      message: 'Product found',
+      message: "Product found",
       data: {
         ic_code: serial.ic_code,
         serial_number: serial.serial_number,
@@ -90,25 +105,43 @@ export const getSerialDetails = async (req: Request, res: Response, next: NextFu
   }
 };
 
-export const getSerialByIcCodeAndSerial = async (req: Request, res: Response, next: NextFunction) => {
+export const getSerialByIcCodeAndSerial = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { ic_code, serial_number } = req.body;
     if (!ic_code || !serial_number) {
-      return res.status(400).json({ success: false, message: 'ic_code and serial_number are required' });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "ic_code and serial_number are required",
+        });
     }
+
+    const barcode = await getProductBarcode(ic_code);
+
+    const findSerialProduct = barcode ? barcode.ic_code : ic_code;
+
     const serial = await prisma.icSerial.findFirst({
-      where: { ic_code, serial_number },
+      where: { ic_code: findSerialProduct, serial_number },
       include: { icInventory: true },
     });
     if (!serial) {
-      return res.status(404).json({ success: false, message: 'Serial number not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Serial number not found" });
     }
     if (!serial.icInventory) {
-      return res.status(404).json({ success: false, message: 'Product not found for this serial' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found for this serial" });
     }
     const response = {
       success: true,
-      message: 'Product found',
+      message: "Product found",
       data: {
         ic_code: serial.ic_code,
         serial_number: serial.serial_number,
@@ -122,4 +155,19 @@ export const getSerialByIcCodeAndSerial = async (req: Request, res: Response, ne
   } catch (error) {
     next(error);
   }
+};
+
+
+export const getProductBarcode = async (
+  barcode: string,
+): Promise<InventoryBarcode | null> => {
+
+    const inventoryBarcode = await prisma.inventoryBarcode.findUnique({
+      where: {
+        barcode: barcode,
+      },
+    });
+
+   
+    return inventoryBarcode;
 };

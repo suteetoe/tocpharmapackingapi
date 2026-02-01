@@ -71,6 +71,13 @@ model IcInventory {
   @@map("ic_inventory")
 }
 
+model InventoryBarcode {
+  barcode String @id
+  ic_code String @map("ic_code")
+
+  @@map("ic_inventory_barcode")
+}
+
 model IcSerial {
   ic_code       String   @map("ic_code") @db.VarChar(50)
   serial_number String   @map("serial_number") @db.VarChar(255)
