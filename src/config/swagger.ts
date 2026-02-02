@@ -6,7 +6,7 @@ const options: swaggerJsdoc.Options = {
     info: {
       title: 'TOC Pharma Packing API',
       version: '1.0.0',
-      description: 'API documentation for TOC Pharma Packing application',
+      description: 'API documentation for TOC Pharma Packing application - Generates OpenAPI specification for client SDK generation',
       contact: {
         name: 'API Support',
       },

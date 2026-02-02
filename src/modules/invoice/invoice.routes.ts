@@ -284,6 +284,22 @@ router.post('/shipment-confirm', shipmentConfirm);
  *                       doc_line_number:
  *                         type: integer
  *                         nullable: true
+ *                 packer:
+ *                   type: object
+ *                   nullable: true
+ *                   description: Packer information from psm_packing_confirmed table
+ *                   properties:
+ *                     user_code:
+ *                       type: string
+ *                       description: Employee code of the packer
+ *                     user_name:
+ *                       type: string
+ *                       description: Name of the packer from erp_user table
+ *                     packing_date:
+ *                       type: string
+ *                       format: date-time
+ *                       nullable: true
+ *                       description: Date and time when packing was confirmed
  *       404:
  *         description: Packing not found
  */

@@ -23,6 +23,8 @@ model ErpUser {
   code     String @unique
   name_1   String
 
+  psmPackingConfirmed PsmPackingConfirmed[]
+
   @@map("erp_user")
 }
 
@@ -118,4 +120,14 @@ model IcTransSerialNumber {
 
   arCustomer ArCustomer?     @relation(fields: [cust_code], references: [code])
   @@map("ic_trans_serial_number")
+}
+
+model PsmPackingConfirmed {
+  doc_no       String   @id @map("doc_no") @db.VarChar(50)
+  user_code    String   @map("user_code") @db.VarChar(50)
+  packing_date DateTime @default(now()) @map("packing_date")
+
+  erpUser ErpUser? @relation(fields: [user_code], references: [code])
+
+  @@map("psm_packing_confirmed")
 }

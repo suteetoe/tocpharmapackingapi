@@ -167,7 +167,7 @@ export const getInvoiceDetails = async (req: Request, res: Response, next: NextF
 
 export const shipmentConfirm = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { invoice_no, serials } = req.body;
+    const { invoice_no, serials, employee_code } = req.body;
 
     if (!invoice_no) {
       return next(new AppError('Invoice number is required', 400));
@@ -175,6 +175,10 @@ export const shipmentConfirm = async (req: Request, res: Response, next: NextFun
 
     if (!serials || !Array.isArray(serials) || serials.length === 0) {
       return next(new AppError('Serials list is required', 400));
+    }
+
+    if (!employee_code) {
+      return next(new AppError('Employee code is required', 400));
     }
 
     // 1. Fetch Invoice details to validate items
@@ -208,7 +212,7 @@ export const shipmentConfirm = async (req: Request, res: Response, next: NextFun
       }
     }
 
-    // 3. Save to IcTransSerialNumber
+    // 3. Save to IcTransSerialNumber and PsmPackingConfirmed
     await prisma.$transaction(async (tx) => {
       for (const serial of serials) {
         await tx.icTransSerialNumber.create({
@@ -224,6 +228,22 @@ export const shipmentConfirm = async (req: Request, res: Response, next: NextFun
           },
         });
       }
+
+      // Record who confirmed the shipment
+      await tx.psmPackingConfirmed.upsert({
+        where: {
+          doc_no: invoice_no,
+        },
+        update: {
+          user_code: employee_code,
+          packing_date: new Date(),
+        },
+        create: {
+          doc_no: invoice_no,
+          user_code: employee_code,
+          packing_date: new Date(),
+        },
+      });
     });
 
     res.status(200).json({
@@ -273,6 +293,16 @@ export const getPackingPrintData = async (req: Request, res: Response, next: Nex
       },
     });
 
+    // ดึงข้อมูลผู้จัดสินค้าจากตาราง psm_packing_confirmed
+    const packingConfirmed = await prisma.psmPackingConfirmed.findUnique({
+      where: {
+        doc_no: invoice_no,
+      },
+      include: {
+        erpUser: true,
+      },
+    });
+
     const response = {
       doc_no: invoice.doc_no,
       trans_flag: invoice.trans_flag,
@@ -307,6 +337,15 @@ export const getPackingPrintData = async (req: Request, res: Response, next: Nex
         line_number: serial.roworder,
         doc_line_number: serial.doc_line_number,
       })),
+      packer: packingConfirmed
+        ? {
+            user_code: packingConfirmed.user_code,
+            user_name: packingConfirmed.erpUser?.name_1 || '',
+            packing_date: packingConfirmed.packing_date
+              ? packingConfirmed.packing_date.toISOString()
+              : null,
+          }
+        : null,
     };
 
     res.status(200).json(response);
