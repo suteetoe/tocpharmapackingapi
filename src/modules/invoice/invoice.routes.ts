@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getInvoiceDetails, shipmentConfirm, getPackingPrintData } from './invoice.controller';
+import { getInvoiceDetails, shipmentConfirm, getPackingPrintData, getCompletedPackings } from './invoice.controller';
 
 const router = Router();
 
@@ -288,5 +288,116 @@ router.post('/shipment-confirm', shipmentConfirm);
  *         description: Packing not found
  */
 router.get('/packing/:invoice_no', getPackingPrintData);
+
+/**
+ * @swagger
+ * /invoice/completed-packings:
+ *   get:
+ *     summary: Get list of completed packings (for picking list)
+ *     tags: [Invoice]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date_from
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter by date from (YYYY-MM-DD)
+ *       - in: query
+ *         name: date_to
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter by date to (YYYY-MM-DD)
+ *       - in: query
+ *         name: invoice_no
+ *         schema:
+ *           type: string
+ *         description: Filter by invoice number (partial match)
+ *       - in: query
+ *         name: only_completed
+ *         schema:
+ *           type: string
+ *           enum: ['true', 'false']
+ *           default: 'true'
+ *         description: Show only completed packings (serial numbers fully recorded)
+ *     responses:
+ *       200:
+ *         description: List of packings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 total:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       doc_no:
+ *                         type: string
+ *                       trans_flag:
+ *                         type: integer
+ *                       doc_date:
+ *                         type: string
+ *                         format: date-time
+ *                         nullable: true
+ *                       cust_code:
+ *                         type: string
+ *                         nullable: true
+ *                       total_amount:
+ *                         type: string
+ *                       arCustomer:
+ *                         type: object
+ *                         properties:
+ *                           code:
+ *                             type: string
+ *                           name_1:
+ *                             type: string
+ *                       details:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             roworder:
+ *                               type: integer
+ *                             item_code:
+ *                               type: string
+ *                             item_name:
+ *                               type: string
+ *                             qty:
+ *                               type: string
+ *                             unit_code:
+ *                               type: string
+ *                             is_serial_number:
+ *                               type: integer
+ *                       serialnumbers:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             ic_code:
+ *                               type: string
+ *                             serial_number:
+ *                               type: string
+ *                             line_number:
+ *                               type: integer
+ *                             doc_line_number:
+ *                               type: integer
+ *                       isComplete:
+ *                         type: boolean
+ *                       scannedCount:
+ *                         type: integer
+ *                       requiredCount:
+ *                         type: integer
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/completed-packings', getCompletedPackings);
 
 export default router;
