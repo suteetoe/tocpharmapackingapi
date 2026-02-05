@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getInvoiceDetails, shipmentConfirm, getPackingPrintData, getCompletedPackings } from './invoice.controller';
+import { getInvoiceDetails, shipmentConfirm, getPackingPrintData, getCompletedPackings, generatePackingPDF } from './invoice.controller';
 
 const router = Router();
 
@@ -415,5 +415,33 @@ router.get('/packing/:invoice_no', getPackingPrintData);
  *         description: Unauthorized
  */
 router.get('/completed-packings', getCompletedPackings);
+
+/**
+ * @swagger
+ * /invoice/packing/{invoice_no}/pdf:
+ *   get:
+ *     summary: Generate PDF for serial number record
+ *     tags: [Invoice]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: invoice_no
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Invoice number
+ *     responses:
+ *       200:
+ *         description: PDF file
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Invoice not found
+ */
+router.get('/packing/:invoice_no/pdf', generatePackingPDF);
 
 export default router;

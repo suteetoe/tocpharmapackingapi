@@ -1,4 +1,8 @@
 import swaggerJsdoc from 'swagger-jsdoc';
+import config from './config';
+
+const pathPrefix = config.pathPrefix.replace(/\/$/, ''); // Remove trailing slash if present
+const serverUrl = `${config.hostName}:${config.port}${pathPrefix}/api`;
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -13,7 +17,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000/api',
+        url: serverUrl,
         description: 'Development server',
       },
     ],

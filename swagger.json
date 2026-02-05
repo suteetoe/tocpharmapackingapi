@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000/api",
+      "url": "http://localhost:8088/tocpackingapi/api",
       "description": "Development server"
     }
   ],

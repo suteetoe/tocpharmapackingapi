@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../../config/prisma';
 import { AppError } from '../../utils/AppError';
+import { generatePackingPDF } from '../../services/pdf.service';
+
+export { generatePackingPDF };
 
 /**
  * Get list of invoices with complete serial numbers for picking list
@@ -352,4 +355,4 @@ export const getPackingPrintData = async (req: Request, res: Response, next: Nex
   } catch (error) {
     next(error);
   }
-};
+}
