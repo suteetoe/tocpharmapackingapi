@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
-const fontsPath = path.join(__dirname, '../fonts');
+const fontsPath = path.join(__dirname, '');
 
 export interface FontConfig {
   normal: string;
@@ -19,14 +19,14 @@ function readFontFile(fontName: string): string {
   throw new Error(`Font file not found: ${fontPath}`);
 }
 
-export const fonts: Record<string, FontConfig> = {
-  Sarabun: {
-    normal: readFontFile('Sarabun/Sarabun-Regular.ttf'),
-    bold: readFontFile('Sarabun/Sarabun-Medium.ttf'),
-    italics: readFontFile('Sarabun/Sarabun-Italic.ttf'),
-    bolditalics: readFontFile('Sarabun/Sarabun-MediumItalic.ttf'),
-  },
-};
+// export const fonts: Record<string, FontConfig> = {
+//   Sarabun: {
+//     normal: readFontFile('Sarabun/Sarabun-Regular.ttf'),
+//     bold: readFontFile('Sarabun/Sarabun-Medium.ttf'),
+//     italics: readFontFile('Sarabun/Sarabun-Italic.ttf'),
+//     bolditalics: readFontFile('Sarabun/Sarabun-MediumItalic.ttf'),
+//   },
+// };
 
 export const defaultFont = 'Sarabun';
 

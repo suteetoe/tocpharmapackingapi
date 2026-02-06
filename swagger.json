@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8088/tocpackingapi/api",
+      "url": "http://localhost:8088/api",
       "description": "Development server"
     }
   ],
@@ -772,6 +772,46 @@
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/invoice/packing/{invoice_no}/pdf": {
+      "get": {
+        "summary": "Generate PDF for serial number record",
+        "tags": [
+          "Invoice"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invoice_no",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Invoice number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF file",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found"
           }
         }
       }

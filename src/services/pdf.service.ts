@@ -151,9 +151,36 @@ function buildTableBody(data: PackingData): any[][] {
     }
   }
 
+  // // Add header rows
+  // body.push([
+  //   {
+  //     text: "Item Code",
+  //     style: "tableHeader",
+  //     border: [false, true, false, true],
+  //   },
+  //   {
+  //     text: "Item Name",
+  //     style: "tableHeader",
+  //     border: [false, true, false, true],
+  //   },
+  //   {
+  //     text: "Qty",
+  //     style: "tableHeader",
+  //     alignment: "center",
+  //     border: [false, true, false, true],
+  //   },
+  //   {
+  //     text: "Serial Number",
+  //     style: "tableHeader",
+  //     border: [false, true, false, true],
+  //   },
+  // ]);
+
   // Add data rows
+  let rowIndex = 1;
   for (const item of itemsWithSerials) {
     body.push([
+      rowIndex++,
       item.item_code,
       item.item_name,
       { text: item.qty, alignment: "center" },
@@ -166,138 +193,199 @@ function buildTableBody(data: PackingData): any[][] {
 
 function buildPDFDocument(data: PackingData): any {
   const tableBody = buildTableBody(data);
-  const itemsPerPage = 20;
+  const itemsPerPage = 55;
   const totalPages = Math.ceil(tableBody.length / itemsPerPage);
 
   return {
     pageSize: "A4",
     pageOrientation: "portrait",
-    pageMargins: [40, 60, 40, 60],
+    pageMargins: [40, 110, 40, 40],
     defaultStyle: {
       font: "Sarabun",
-      fontSize: 12,
+      fontSize: 8,
+    },
+    header: function (currentPage: number, pageCount: number) {
+      return [
+        {
+          text: `PAGE : ${currentPage}/${pageCount}`,
+          alignment: "right",
+          margin: [0, 20, 40, 0],
+        }, 
+        {
+          text: "SERIAL NUMBER RECORD",
+          style: "header",
+          alignment: "center",
+          margin: [40, 10, 40, 10],
+        },
+        {
+          table: {
+            widths: ["10%", "15%", "*", "10%", "15%"],
+            body: [
+              [{ text: "INV.      :", bold: true }, data.doc_no, "", "", ""],
+              // [{ text: "CUST.     :", bold: true }, data.arCustomer.code, "", ""],
+              // [
+              //   { text: "CUST NAME :", bold: true },
+              //   { text: data.arCustomer.name_1, colSpan: 3 },
+              //   "",
+              //   "",
+              // ],
+              [
+                { text: "DATE      :", bold: true },
+                formatDate(data.doc_date),
+                "",
+                { text: "PACKER    :", bold: true },
+                data.packer
+                  ? `(${data.packer.user_code}) ${data.packer.user_name}`
+                  : "",
+              ],
+            ],
+          },
+          layout: "noBorders",
+          margin: [40, 0, 40, 0],
+        },
+        {
+          canvas: [
+            {
+              type: "line",
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 1,
+            },
+          ],
+          margin: [40, 0, 0, 0],
+        },
+        // Divider line
+
+        // Main table header
+        {
+          table: {
+            widths: [20, "15%", "*", "10%", "20%"],
+            // headerRows: 1,
+            body: [
+              [
+                { text: "No.", style: "tableHeader" },
+                { text: "Item Code", style: "tableHeader" },
+                { text: "Item Name", style: "tableHeader" },
+                { text: "Qty", style: "tableHeader", alignment: "center" },
+                { text: "Serial Number", style: "tableHeader" },
+              ],
+            ],
+          },
+          layout: "noBorders",
+          margin: [40, 0, 40, 0],
+        },
+        // Divider line
+        {
+          canvas: [
+            {
+              type: "line",
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 1,
+            },
+          ],
+          margin: [40, 0, 40, 0],
+        },
+      ];
     },
     styles: {
       header: {
-        fontSize: 18,
+        fontSize: 10,
         bold: true,
-        margin: [0, 0, 0, 10],
+        margin: [0, 0, 0, 0],
       },
       subheader: {
-        fontSize: 14,
+        fontSize: 9,
         bold: true,
-        margin: [0, 10, 0, 5],
+        margin: [0, 0, 0, 0],
       },
       tableHeader: {
         bold: true,
-        fontSize: 11,
+        fontSize: 9,
       },
       tableBody: {
-        fontSize: 10,
+        fontSize: 8,
+        bordersize: 1,
+        margin: [0, 0, 0, 0],
+        lineHeight: 0.7,
       },
       footer: {
-        fontSize: 10,
+        fontSize: 9,
         italics: true,
       },
     },
     content: [
       // Page number (top right)
-      {
-        text: `PAGE : 1/${totalPages}`,
-        alignment: "right",
-        margin: [0, 0, 0, 10],
-      },
+      // {
+      //   text: `PAGE : 1/${totalPages}`,
+      //   alignment: "right",
+      //   margin: [0, 0, 0, 0],
+      // },
       // Header title
-      {
-        text: "SERIAL NUMBER RECORD",
-        style: "header",
-        alignment: "center",
-      },
+      // {
+      //   text: "SERIAL NUMBER RECORD",
+      //   style: "header",
+      //   alignment: "center",
+      // },
       // Decorative line
-      {
-        text: "****************************************",
-        alignment: "center",
-        margin: [0, 5, 0, 10],
-      },
+      // {
+      //   text: "****************************************",
+      //   alignment: "center",
+      // },
       // Invoice info table
-      {
-        table: {
-          widths: ["auto", "auto", "auto", "*"],
-          body: [
-            [
-              { text: "INV.      :", bold: true },
-              data.doc_no,
-              { text: "DATE      :", bold: true },
-              formatDate(data.doc_date),
-            ],
-            [{ text: "CUST.     :", bold: true }, data.arCustomer.code, "", ""],
-            [
-              { text: "CUST NAME :", bold: true },
-              { text: data.arCustomer.name_1, colSpan: 3 },
-              "",
-              "",
-            ],
-            [
-              { text: "PACKER    :", bold: true },
-              data.packer
-                ? `(${data.packer.user_code}) ${data.packer.user_name}`
-                : "",
-              "",
-              "",
-            ],
-          ],
-        },
-        layout: "noBorders",
-        margin: [0, 0, 0, 10],
-      },
+
       // Divider line
-      {
-        canvas: [
-          {
-            type: "line",
-            x1: 0,
-            y1: 0,
-            x2: 515,
-            y2: 0,
-            lineWidth: 1,
-          },
-        ],
-        margin: [0, 0, 0, 5],
-      },
+      // {
+      //   canvas: [
+      //     {
+      //       type: "line",
+      //       x1: 0,
+      //       y1: 0,
+      //       x2: 515,
+      //       y2: 0,
+      //       lineWidth: 1,
+      //     },
+      //   ],
+      //   margin: [0, 0, 0, 0],
+      // },
       // Main table header
-      {
-        table: {
-          widths: ["15%", "45%", "10%", "30%"],
-          headerRows: 1,
-          body: [
-            [
-              { text: "Item Code", style: "tableHeader" },
-              { text: "Item Name", style: "tableHeader" },
-              { text: "Qty", style: "tableHeader", alignment: "center" },
-              { text: "Serial Number", style: "tableHeader" },
-            ],
-          ],
-        },
-        layout: "noBorders",
-      },
+      // {
+      //   table: {
+      //     widths: ["15%", "45%", "10%", "30%"],
+      //     headerRows: 1,
+      //     body: [
+      //       [
+      //         { text: "Item Code", style: "tableHeader" },
+      //         { text: "Item Name", style: "tableHeader" },
+      //         { text: "Qty", style: "tableHeader", alignment: "center" },
+      //         { text: "Serial Number", style: "tableHeader" },
+      //       ],
+      //     ],
+      //   },
+      //   layout: "noBorders",
+      // },
       // Divider line
-      {
-        canvas: [
-          {
-            type: "line",
-            x1: 0,
-            y1: 0,
-            x2: 515,
-            y2: 0,
-            lineWidth: 1,
-          },
-        ],
-        margin: [0, 0, 0, 5],
-      },
+      // {
+      //   canvas: [
+      //     {
+      //       type: "line",
+      //       x1: 0,
+      //       y1: 0,
+      //       x2: 515,
+      //       y2: 0,
+      //       lineWidth: 1,
+      //     },
+      //   ],
+      //   margin: [0, 0, 0, 0],
+      // },
       // Data rows with pagination
       {
         table: {
-          widths: ["15%", "45%", "10%", "30%"],
+          widths: [20, "15%", "*", "10%", "20%"],
           body: tableBody.slice(1), // Skip header row (already added)
           dontBreakRows: true,
         },
@@ -316,11 +404,11 @@ function buildPDFDocument(data: PackingData): any {
             lineWidth: 1,
           },
         ],
-        margin: [0, 5, 0, 10],
+        margin: [0, 5, 0, 0],
       },
       // Footer info
       {
-        text: `รายการในตาราง ${tableBody.length - 1} รายการ`,
+        text: `รวม ${tableBody.length - 1} รายการ`,
         alignment: "left",
         style: "footer",
       },
@@ -356,12 +444,11 @@ export const generatePackingPDF = async (
     //   },
     // };
     // console.log(docDefinition);
+
     // Generate PDF with custom fonts
     pdfmake.addFonts(pdfmakeFonts);
-    const pdfDocGenerator = pdfmake.createPdf(
-      docDefinition,
-      pdfmakeFonts,
-    );
+
+    const pdfDocGenerator = pdfmake.createPdf(docDefinition);
 
     // pdfDocGenerator.getBlob().then((blob:any) => {
     //       res.setHeader("Content-Type", "application/pdf");
@@ -390,7 +477,6 @@ export const generatePackingPDF = async (
     //   },
     // );
     pdfDocGenerator.getBuffer().then((dataUrl) => {
-
       // console.log(dataUrl)
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
