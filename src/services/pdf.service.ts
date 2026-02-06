@@ -219,9 +219,9 @@ function buildPDFDocument(data: PackingData): any {
         },
         {
           table: {
-            widths: ["10%", "15%", "*", "10%", "15%"],
+            widths: [30, "30%", "*", 40, "30%"],
             body: [
-              [{ text: "INV.      :", bold: true }, data.doc_no, "", "", ""],
+              [{ text: "INV. :", bold: true }, data.doc_no, "", "", ""],
               // [{ text: "CUST.     :", bold: true }, data.arCustomer.code, "", ""],
               // [
               //   { text: "CUST NAME :", bold: true },
@@ -230,10 +230,10 @@ function buildPDFDocument(data: PackingData): any {
               //   "",
               // ],
               [
-                { text: "DATE      :", bold: true },
+                { text: "DATE :", bold: true },
                 formatDate(data.doc_date),
                 "",
-                { text: "PACKER    :", bold: true },
+                { text: "PACKER :", bold: true },
                 data.packer
                   ? `(${data.packer.user_code}) ${data.packer.user_name}`
                   : "",
